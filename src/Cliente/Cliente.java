@@ -17,7 +17,7 @@ public class Cliente {
     static InetAddress ip=null;
     
     public static void main(String args[]){
-        if(args.length< 2){
+        if(args.length<2){
            System.out.println("Error, debes especificar direccion  y puerto!!");
            System.out.println("#javac Cliente [Dir IP] ");
            System.exit(0);
@@ -30,7 +30,7 @@ public class Cliente {
           System.out.println("Error en la direccion ip del cliente: " +ex.getMessage());
         }
     
-      //nuevos cambios
+      //nuevos cambios vedg
     }
     
 }
