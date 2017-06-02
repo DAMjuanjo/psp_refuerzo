@@ -24,7 +24,7 @@ public class Cliente {
         }
         
         try{
-            ip=InetAddress.getByName("localhost");
+            ip=InetAddress.getByName(args[0]);
         
         }catch(UnknownHostException ex){
           System.out.println("Error en la direccion ip del cliente: " +ex.getMessage());

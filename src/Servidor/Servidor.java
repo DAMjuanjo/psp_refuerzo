@@ -15,7 +15,7 @@ import java.net.ServerSocket;
  */
 public class Servidor {
     static int puerto=25000;
-    static int ncli;
+    static int ncli=1;
     public static void main(String args[]){
         
         System.out.println("[--------------------------------]");

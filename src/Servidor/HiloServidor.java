@@ -40,7 +40,7 @@ public class HiloServidor implements Runnable{
     ObjectOutputStream OUT;
     FileInputStream ABRIR;
     FileOutputStream LEER;
-    static String sha256;
+    static String ba;
     File fichero= new File("confidencial.txt");
     
     
@@ -69,7 +69,7 @@ public class HiloServidor implements Runnable{
             
             System.out.println("Haciendo suma SHA256 al fichero: "+fichero.getName()+ ".des_"+id_copia);
             checkSum();
-            System.out.println("SUMA: "+sha256);
+            System.out.println("SUMA: "+ba);
 
             System.out.println("creando fichero.des_"+id_copia);
             encriptarFichero();
@@ -94,8 +94,8 @@ public class HiloServidor implements Runnable{
             }
             byte []sha256sum=md.digest();
             Base64.Encoder codi = Base64.getEncoder();
-            String ba = codi.encodeToString(sha256sum);
-            System.out.println("Suma SHA-256: " + ba +"\n");
+            ba = codi.encodeToString(sha256sum);
+           
             
         
         }catch(IOException | NoSuchAlgorithmException ex){
