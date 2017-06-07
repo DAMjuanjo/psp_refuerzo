@@ -25,15 +25,15 @@ public class Servidor {
         System.out.println("[--------------------------------]");
              
              
-             
-             
         try{
             ServerSocket ser= new ServerSocket(puerto);
+            
+            do{
             HiloServidor mh=new HiloServidor(ser.accept(), ncli);
             Thread hilo = new Thread(mh);
             hilo.start();
             ncli++;
-            
+            }while(true);
             
         }catch(IOException ex){
              System.out.println("Algo paso en el servidor de archivo1: " +ex.getMessage());

@@ -36,11 +36,11 @@ import javax.crypto.spec.DESedeKeySpec;
 public class HiloServidor implements Runnable{
     static Socket con;
     static int id_copia;
-    ObjectInputStream IN;
-    ObjectOutputStream OUT;
-    FileInputStream ABRIR;
-    FileOutputStream LEER;
-    static String ba;
+    ObjectInputStream OIS;
+    ObjectOutputStream OOS;
+    FileInputStream FIS;
+    BufferedInputStream BIS;
+    static String suma;
     File fichero= new File("confidencial.txt");
     
     
@@ -54,24 +54,25 @@ public class HiloServidor implements Runnable{
     public void run() {
         try{
            
-            ObjectInputStream in=new ObjectInputStream(con.getInputStream());
-            ObjectOutputStream salida= new ObjectOutputStream(con.getOutputStream());
-            FileInputStream abrir=new FileInputStream(fichero);
-            FileOutputStream leer=new FileOutputStream(fichero);
+            ObjectInputStream ois=new ObjectInputStream(con.getInputStream());
+            ObjectOutputStream oos= new ObjectOutputStream(con.getOutputStream());
+            FileInputStream fis=new FileInputStream(fichero);
+            BufferedInputStream bis = new BufferedInputStream(fis);  
             
-            IN=in;
-            OUT=salida;
-            ABRIR=abrir;
-            LEER=leer;
+            OIS=ois;
+            OOS=oos;
+            FIS=fis;
+            BIS=bis;
             
             
-            System.out.println("LLegando peticion de una maquina "+con.getLocalAddress());
+            System.out.println("LLegando peticion de una maquina "+con.getLocalSocketAddress());
             
-            System.out.println("Haciendo suma SHA256 al fichero: "+fichero.getName()+ ".des_"+id_copia);
+            System.out.println("Haciendo suma SHA256 al fichero \"confidencial.txt\"");
             checkSum();
-            System.out.println("SUMA: "+ba);
+            System.out.println("SUMA: "+suma);
 
-            System.out.println("creando fichero.des_"+id_copia);
+            System.out.println("creando fichero: confidencial.des "+id_copia);
+            System.out.println("3.- Mandando Fichero por Red.");
             encriptarFichero();
             
             
@@ -89,12 +90,12 @@ public class HiloServidor implements Runnable{
        
         try{     
             md=MessageDigest.getInstance("SHA-256");
-            while((read=ABRIR.read(textBytes))>0){
+            while((read=BIS.read(textBytes))>0){
                 md.update(textBytes,0,read);
             }
             byte []sha256sum=md.digest();
             Base64.Encoder codi = Base64.getEncoder();
-            ba = codi.encodeToString(sha256sum);
+            suma = codi.encodeToString(sha256sum);
            
             
         
@@ -151,17 +152,26 @@ public class HiloServidor implements Runnable{
         }
        
 }
-    public void enviaFichero(ObjectOutputStream oos){
+    public void enviaFichero(){
+        int p=0;
+        boolean ultimo=false;
+        File fichero = new File("confidencial.des "+id_copia);
+        if(!fichero.exists()){
+            System.err.println("No existe el fichero encriptado Copia!!!!!");
+            System.exit(0);   
+        }
+        
         
         try {
             //Abrimos fichero
             FileInputStream fis = new FileInputStream(fichero);
             Fichero_Envio f= new Fichero_Envio();
-            f.setNombre(fichero.getName());
+            f.setNombre("confidencial.des "+id_copia);
             //leemos los primeros bytes del fichero
             int leidos;
             do{
-                leidos = fis.read(f.contenidoFichero);
+                //me he quedado por aqui.
+                leidos = fis.read(f.getContenidoFichero())));
                 if(leidos<1024){
                     f.setUltimobyte(true);
                     f.bytesvalidos=leidos;
@@ -190,3 +200,4 @@ public class HiloServidor implements Runnable{
     
 }
 
+    
