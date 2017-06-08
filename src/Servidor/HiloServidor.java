@@ -5,6 +5,8 @@
  */
 package Servidor;
 
+import Mensajes.Fichero_Envio;
+import Mensajes.Mensaje;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,17 +67,21 @@ public class HiloServidor implements Runnable{
             BIS=bis;
             
             
-            System.out.println("LLegando peticion de una maquina "+con.getLocalSocketAddress());
+            System.out.println("1.- LLegando peticion de una maquina "+con.getLocalSocketAddress());
             
-            System.out.println("Haciendo suma SHA256 al fichero \"confidencial.txt\"");
+            System.out.println("2.- Haciendo suma SHA256 al fichero \"confidencial.txt\"");
             checkSum();
             System.out.println("SUMA: "+suma);
 
-            System.out.println("creando fichero: confidencial.des "+id_copia);
-            System.out.println("3.- Mandando Fichero por Red.");
+            System.out.println("3.- Creando fichero: confidencial.des "+id_copia);
             encriptarFichero();
             
+            System.out.println("4.- Mandando Fichero por Red.");
+            enviaFichero();
             
+            System.out.println("5.- Mandamos CheckSum.");   
+            EnviarSuma();
+            System.out.println("6.- Fin de las operaciones");   
             
         }catch(IOException ex){
             System.out.println("Error en la clase hilo servidor.." +ex.getMessage());
@@ -154,48 +160,60 @@ public class HiloServidor implements Runnable{
 }
     public void enviaFichero(){
         int p=0;
-        boolean ultimo=false;
+        boolean EnviadoUltimo=false;
         File fichero = new File("confidencial.des "+id_copia);
         if(!fichero.exists()){
             System.err.println("No existe el fichero encriptado Copia!!!!!");
             System.exit(0);   
         }
         
-        
         try {
             //Abrimos fichero
             FileInputStream fis = new FileInputStream(fichero);
             Fichero_Envio f= new Fichero_Envio();
             f.setNombre("confidencial.des "+id_copia);
-            //leemos los primeros bytes del fichero
-            int leidos;
-            do{
-                //me he quedado por aqui.
-                leidos = fis.read(f.getContenidoFichero())));
-                if(leidos<1024){
-                    f.setUltimobyte(true);
-                    f.bytesvalidos=leidos;
-                }
-                else {
-                    f.setUltimobyte(false);
-                    f.bytesvalidos=1024;
-                }
-                //enviamos por el socket
-                oos.writeObject(f);
-                if(f.isUltimobyte()) 
-                    break;
-                //Creamos un NUevo mensaje
-                f = new Fichero_Envio();
-               f.setNombre(fichero.getName());
-                //volvemos a lerr
-             }while(leidos>-1);
+            int leidos=0;
             
+                //me he quedado por aqui.
+               while((leidos=fis.read(f.getContenidoFichero()))>0){
+                   f.setBytesvalidos(leidos);
+                   if(leidos<10){
+                       f.setUltimobyte(true);
+                       EnviadoUltimo=true;
+                   }else{
+                       f.setUltimobyte(false);
+                   }
+                    
+                   OOS.writeObject(f);
+                   if(f.isUltimobyte()){
+                       break;
+                   }
+                   //nuevo mensaje
+                   f.setNombre("confidencial.des "+id_copia);
+               }
+               
         } catch (FileNotFoundException ex) {
              System.out.println("Algo paso en el envio del fichero 1: " +ex.getMessage());
         } catch (IOException ex) {
-             System.out.println("Algo paso en el envio del fichero 1: " +ex.getMessage());
-
+             System.out.println("Algo paso en el envio del fichero 2: " +ex.getMessage());
         }
+         //borramos el fichero .des creado
+        if(fichero.delete()){
+            System.out.println("Fichero aux borrado.");
+        }
+    }
+    
+    public void EnviarSuma(){
+        Mensaje ms= new Mensaje();
+        ms.setMensajeEnviar(suma);
+        System.out.println("\t4.1.- CheckSum a mandar: " + ms.getMensajeEnviar());
+        try{
+            OOS.writeObject(ms);
+            System.out.println("CheckSum enviado");
+        }catch(IOException ex){
+            System.out.println("Algo paso en el envio de la suma" +ex.getMessage());
+        }
+         
     }
     
 }

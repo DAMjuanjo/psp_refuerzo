@@ -5,6 +5,7 @@
  */
 package Cliente;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -17,6 +18,8 @@ public class Cliente {
     static InetAddress ip=null;
     
     public static void main(String args[]){
+        File f= new File("confidencial.des.lol");
+        
         if(args.length< 2){
            System.out.println("Error, debes especificar direccion  y puerto!!");
            System.out.println("#javac Cliente [Dir IP] ");
@@ -25,12 +28,17 @@ public class Cliente {
         
         try{
             ip=InetAddress.getByName(args[0]);
+            puerto=Integer.parseInt(args[1]);
         
         }catch(UnknownHostException ex){
           System.out.println("Error en la direccion ip del cliente: " +ex.getMessage());
+         }catch(NumberFormatException ex){
+          System.out.println("Error en el formato del puerto: " +ex.getMessage());
+          System.exit(0);
         }
     
-      //nuevos cambios con el nuevo repositorio
+        //Inicializamos el socket y la salida y entrada.
+      
     }
     
 }

@@ -11,19 +11,24 @@ import java.io.Serializable;
  * @author prohibido
  */
 public class Mensaje implements Serializable{
-    String nombre;
+    String mensajeEnviar;
     
     public Mensaje(String m){
-        nombre=m;
+        mensajeEnviar=m;
     }
 
-    public String getNombre() {
-        return nombre;
+    public Mensaje() {
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public String getMensajeEnviar() {
+        return mensajeEnviar;
     }
+
+    public void setMensajeEnviar(String mensajeEnviar) {
+        this.mensajeEnviar = mensajeEnviar;
+    }
+
+  
     
     
     
